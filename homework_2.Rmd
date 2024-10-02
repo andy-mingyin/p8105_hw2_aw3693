@@ -14,7 +14,7 @@ library(haven)
 ## Problem 2
 load and clean mr trash wheel dataset
 ```{r}
-mr_trash_wheel = read_excel("./202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1) |>
+mr_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -26,7 +26,7 @@ mr_trash_wheel
 
 load and clean prof trash wheel dataset
 ```{r}
-prof_trash_wheel = read_excel("./202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1) |>
+prof_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -40,7 +40,7 @@ prof_trash_wheel = read_excel("./202409 Trash Wheel Collection Data.xlsx", sheet
 load and clean Gwynnda trash wheel dataset
 
 ```{r}
-gwynnda_trash_wheel = read_excel("./202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1) |>
+gwynnda_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -73,11 +73,13 @@ Total cigarette butts collected by Gwynnda in June 2022
 ```{r}
 tot_butts_june_2022=
    trash_wheel_data |> 
-    filter(source == "Gwynnda Trash Wheel",month =="June", year == "2022") |> 
+    filter(source == "Gwynnda Trash Wheel", month =="June", year == "2022") |> 
   summarize(total_weight = sum(weight_tons, na.rm = TRUE))
 
 tot_butts_june_2022
 ```
 The total cigarette butts collected by Gwynnda in June 2022 is `tot_butts_june_2022` tons. 
+
+## Problem 3
 
 
