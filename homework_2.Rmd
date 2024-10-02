@@ -82,52 +82,107 @@ The total cigarette butts collected by Gwynnda in June 2022 is `r tot_butts_june
 
 ## Problem 3
 load the dataset and did some cleaning
+
 ```{r}
 bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |> 
   janitor::clean_names() |>
-
- mutate(
+  mutate(
     series = as.numeric(series), 
-   baker =  word(baker_name, 1), 
-   baker = str_to_lower(str_trim(baker)
-   ))
+    baker_name = str_to_lower(str_trim(baker_name)), 
+     baker =  word(baker_name, 1)
+  )
+
 
 bakes_df = read_csv("./data/bakes.csv", na = c("NA", ".", "", "N/A")) |> 
   janitor::clean_names() |>
   mutate(
     series = as.numeric(series),
     episode = as.numeric(episode), 
-    baker = str_to_lower(str_trim(baker)
-    ))
+    baker = str_to_lower(str_trim(baker)),  
+    baker = ifelse(baker == '"jo"', "joanne", baker)  
+  )
+
 
 results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip = 2) |> 
   janitor::clean_names() |>
-  
-  mutate(series = as.numeric(series),
-         episode = as.numeric(episode), 
-         baker = str_to_lower(str_trim(baker))
-         )
-bakers_df
+  mutate(
+    series = as.numeric(series),
+    episode = as.numeric(episode), 
+    baker = str_to_lower(str_trim(baker))  
+  )
 ```
-use `anti_join()` to compare two datasets
+
+use `anti_join()` to compare three datasets
+
 
 ```{r}
 anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
 anti_join(results_df, bakes_df, by = c("series", "episode", "baker"))
 anti_join(bakers_df, bakes_df, by = c("baker", "series"))
 anti_join(bakes_df, bakers_df, by = c("baker", "series"))
+anti_join(results_df, bakers_df, by = c("series", "baker"))
+anti_join(bakers_df, results_df, by = c("series","baker"))
 ```
+I found out that Jo is actually Joanne, then I change it. 
+
 
 merge all three
-
 ```{r}
-final_df = bakes_df |>
-  full_join(bakers_df, by = c("baker", "series")) |>
-  full_join(results_df, by = c("series", "episode", "baker"))
-
-head(final_df)
-write_csv(final_df, "./data/final_df.csv")
+final_df = results_df |>
+  left_join(bakes_df, by = c("series", "episode", "baker")) |>
+  left_join(bakers_df, by = c("series", "baker")) 
 ```
 
 
 
+
+
+star bakers and winners from series 5 to 10
+```{r}
+star_bakers = final_df |> 
+  filter(series >= 5 & series <= 10) |> 
+  filter(result == "STAR BAKER" | result == "WINNER") |> 
+  select(series, episode, baker, result)
+
+star_bakers
+```
+
+From series 5 to 10, the all the winners are from episode 10. 
+
+load and clean the viewership data 
+
+```{r}
+viewers_df = read_csv("./data/viewers.csv", na = c("NA", ".", "", "N/A")) |> 
+  janitor::clean_names()
+
+tidy_viewers_df = viewers_df |> 
+  pivot_longer(
+    cols = starts_with("series"),  # Pivot columns that start with "series"
+    names_to = "season",  # The new column for the season (extracted from the column names)
+    values_to = "viewers",  # The corresponding viewership value for each season
+     names_prefix = "series_" # Remove the "series_" prefix to extract only the season number
+  ) |> 
+  mutate(
+    season = as.numeric(season)  # Convert the season values to numeric
+  )
+
+head(tidy_viewers_df, 10)
+```
+the avg viewers in series 1
+
+```{r}
+
+avg_viewers_season_1 <- tidy_viewers_df |> 
+  filter(season == 1) |>  
+  summarise(avg_viewers = mean(viewers, na.rm = TRUE))
+  avg_viewers_season_1
+```
+
+```{r}
+
+avg_viewers_season_5 <- tidy_viewers_df |> 
+  filter(season == 5) |>  
+  summarise(avg_viewers = mean(viewers, na.rm = TRUE))
+  avg_viewers_season_5
+  
+```

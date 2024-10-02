@@ -188,12 +188,11 @@ load the dataset and did some cleaning
 ``` r
 bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |> 
   janitor::clean_names() |>
-
- mutate(
+  mutate(
     series = as.numeric(series), 
-   baker =  word(baker_name, 1), 
-   baker = str_to_lower(str_trim(baker)
-   ))
+    baker_name = str_to_lower(str_trim(baker_name)), 
+     baker =  word(baker_name, 1)
+  )
 ```
 
     ## Rows: 120 Columns: 5
@@ -211,8 +210,9 @@ bakes_df = read_csv("./data/bakes.csv", na = c("NA", ".", "", "N/A")) |>
   mutate(
     series = as.numeric(series),
     episode = as.numeric(episode), 
-    baker = str_to_lower(str_trim(baker)
-    ))
+    baker = str_to_lower(str_trim(baker)),  
+    baker = ifelse(baker == '"jo"', "joanne", baker)  
+  )
 ```
 
     ## Rows: 548 Columns: 5
@@ -227,11 +227,11 @@ bakes_df = read_csv("./data/bakes.csv", na = c("NA", ".", "", "N/A")) |>
 ``` r
 results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip = 2) |> 
   janitor::clean_names() |>
-  
-  mutate(series = as.numeric(series),
-         episode = as.numeric(episode), 
-         baker = str_to_lower(str_trim(baker))
-         )
+  mutate(
+    series = as.numeric(series),
+    episode = as.numeric(episode), 
+    baker = str_to_lower(str_trim(baker))  
+  )
 ```
 
     ## Rows: 1136 Columns: 5
@@ -243,48 +243,21 @@ results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip =
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-``` r
-bakers_df
-```
-
-    ## # A tibble: 120 × 6
-    ##    baker_name       series baker_age baker_occupation             hometown baker
-    ##    <chr>             <dbl>     <dbl> <chr>                        <chr>    <chr>
-    ##  1 Ali Imdad             4        25 Charity worker               Saltley… ali  
-    ##  2 Alice Fevronia       10        28 Geography teacher            Essex    alice
-    ##  3 Alvin Magallanes      6        37 Nurse                        Brackne… alvin
-    ##  4 Amelia LeBruin       10        24 Fashion designer             Halifax  amel…
-    ##  5 Andrew Smyth          7        25 Aerospace engineer           Derby /… andr…
-    ##  6 Annetha Mills         1        30 Midwife                      Essex    anne…
-    ##  7 Antony Amourdoux      9        30 Banker                       London   anto…
-    ##  8 Beca Lyne-Pirkis      4        31 Military Wives' Choir Singer Aldersh… beca 
-    ##  9 Ben Frazer            2        31 Graphic Designer             Northam… ben  
-    ## 10 Benjamina Ebuehi      7        23 Teaching assistant           South L… benj…
-    ## # ℹ 110 more rows
-
-use `anti_join()` to compare two datasets
+use `anti_join()` to compare three datasets
 
 ``` r
 anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
 ```
 
-    ## # A tibble: 8 × 5
-    ##   series episode baker    signature_bake                            show_stopper
-    ##    <dbl>   <dbl> <chr>    <chr>                                     <chr>       
-    ## 1      2       1 "\"jo\"" Chocolate Orange CupcakesOrange and Card… Chocolate a…
-    ## 2      2       2 "\"jo\"" Caramelised Onion, Gruyere and Thyme Qui… Raspberry a…
-    ## 3      2       3 "\"jo\"" Stromboli flavored with Mozzarella, Ham,… Unknown     
-    ## 4      2       4 "\"jo\"" Lavender Biscuits                         Blueberry M…
-    ## 5      2       5 "\"jo\"" Salmon and Asparagus Pie                  Apple and R…
-    ## 6      2       6 "\"jo\"" Rum and Raisin Baked Cheesecake           Limoncello …
-    ## 7      2       7 "\"jo\"" Raspberry & Strawberry Mousse Cake        Pain Aux Ra…
-    ## 8      2       8 "\"jo\"" Raspberry and Blueberry Mille Feuille     Mini Victor…
+    ## # A tibble: 0 × 5
+    ## # ℹ 5 variables: series <dbl>, episode <dbl>, baker <chr>,
+    ## #   signature_bake <chr>, show_stopper <chr>
 
 ``` r
 anti_join(results_df, bakes_df, by = c("series", "episode", "baker"))
 ```
 
-    ## # A tibble: 596 × 5
+    ## # A tibble: 588 × 5
     ##    series episode baker    technical result
     ##     <dbl>   <dbl> <chr>        <dbl> <chr> 
     ##  1      1       2 lea             NA <NA>  
@@ -297,7 +270,7 @@ anti_join(results_df, bakes_df, by = c("series", "episode", "baker"))
     ##  8      1       4 jonathan        NA <NA>  
     ##  9      1       4 lea             NA <NA>  
     ## 10      1       4 louise          NA <NA>  
-    ## # ℹ 586 more rows
+    ## # ℹ 578 more rows
 
 ``` r
 anti_join(bakers_df, bakes_df, by = c("baker", "series"))
@@ -306,16 +279,16 @@ anti_join(bakers_df, bakes_df, by = c("baker", "series"))
     ## # A tibble: 26 × 6
     ##    baker_name          series baker_age baker_occupation          hometown baker
     ##    <chr>                <dbl>     <dbl> <chr>                     <chr>    <chr>
-    ##  1 Alice Fevronia          10        28 Geography teacher         Essex    alice
-    ##  2 Amelia LeBruin          10        24 Fashion designer          Halifax  amel…
-    ##  3 Antony Amourdoux         9        30 Banker                    London   anto…
-    ##  4 Briony Williams          9        33 Full-time parent          Bristol  brio…
-    ##  5 Dan Beasley-Harling      9        36 Full-time parent          London   dan  
-    ##  6 Dan Chambers            10        32 Support worker            Rotherh… dan  
-    ##  7 David Atherton          10        36 International health adv… Whitby   david
-    ##  8 Helena Garcia           10        40 Online project manager    Leeds    hele…
-    ##  9 Henry Bird              10        20 Student                   Durham   henry
-    ## 10 Imelda McCarron          9        33 Countryside recreation o… County … imel…
+    ##  1 alice fevronia          10        28 Geography teacher         Essex    alice
+    ##  2 amelia lebruin          10        24 Fashion designer          Halifax  amel…
+    ##  3 antony amourdoux         9        30 Banker                    London   anto…
+    ##  4 briony williams          9        33 Full-time parent          Bristol  brio…
+    ##  5 dan beasley-harling      9        36 Full-time parent          London   dan  
+    ##  6 dan chambers            10        32 Support worker            Rotherh… dan  
+    ##  7 david atherton          10        36 International health adv… Whitby   david
+    ##  8 helena garcia           10        40 Online project manager    Leeds    hele…
+    ##  9 henry bird              10        20 Student                   Durham   henry
+    ## 10 imelda mccarron          9        33 Countryside recreation o… County … imel…
     ## # ℹ 16 more rows
 
 ``` r
@@ -323,39 +296,146 @@ anti_join(bakes_df, bakers_df, by = c("baker", "series"))
 ```
 
     ## # A tibble: 8 × 5
-    ##   series episode baker    signature_bake                            show_stopper
-    ##    <dbl>   <dbl> <chr>    <chr>                                     <chr>       
-    ## 1      2       1 "\"jo\"" Chocolate Orange CupcakesOrange and Card… Chocolate a…
-    ## 2      2       2 "\"jo\"" Caramelised Onion, Gruyere and Thyme Qui… Raspberry a…
-    ## 3      2       3 "\"jo\"" Stromboli flavored with Mozzarella, Ham,… Unknown     
-    ## 4      2       4 "\"jo\"" Lavender Biscuits                         Blueberry M…
-    ## 5      2       5 "\"jo\"" Salmon and Asparagus Pie                  Apple and R…
-    ## 6      2       6 "\"jo\"" Rum and Raisin Baked Cheesecake           Limoncello …
-    ## 7      2       7 "\"jo\"" Raspberry & Strawberry Mousse Cake        Pain Aux Ra…
-    ## 8      2       8 "\"jo\"" Raspberry and Blueberry Mille Feuille     Mini Victor…
+    ##   series episode baker  signature_bake                              show_stopper
+    ##    <dbl>   <dbl> <chr>  <chr>                                       <chr>       
+    ## 1      2       1 joanne Chocolate Orange CupcakesOrange and Cardam… Chocolate a…
+    ## 2      2       2 joanne Caramelised Onion, Gruyere and Thyme Quiche Raspberry a…
+    ## 3      2       3 joanne Stromboli flavored with Mozzarella, Ham, a… Unknown     
+    ## 4      2       4 joanne Lavender Biscuits                           Blueberry M…
+    ## 5      2       5 joanne Salmon and Asparagus Pie                    Apple and R…
+    ## 6      2       6 joanne Rum and Raisin Baked Cheesecake             Limoncello …
+    ## 7      2       7 joanne Raspberry & Strawberry Mousse Cake          Pain Aux Ra…
+    ## 8      2       8 joanne Raspberry and Blueberry Mille Feuille       Mini Victor…
+
+``` r
+anti_join(results_df, bakers_df, by = c("series", "baker"))
+```
+
+    ## # A tibble: 8 × 5
+    ##   series episode baker  technical result    
+    ##    <dbl>   <dbl> <chr>      <dbl> <chr>     
+    ## 1      2       1 joanne        11 IN        
+    ## 2      2       2 joanne        10 IN        
+    ## 3      2       3 joanne         1 IN        
+    ## 4      2       4 joanne         8 IN        
+    ## 5      2       5 joanne         6 IN        
+    ## 6      2       6 joanne         1 STAR BAKER
+    ## 7      2       7 joanne         3 IN        
+    ## 8      2       8 joanne         1 WINNER
+
+``` r
+anti_join(bakers_df, results_df, by = c("series","baker"))
+```
+
+    ## # A tibble: 1 × 6
+    ##   baker_name  series baker_age baker_occupation hometown     baker
+    ##   <chr>        <dbl>     <dbl> <chr>            <chr>        <chr>
+    ## 1 jo wheatley      2        41 Housewife        Ongar, Essex jo
+
+I found out that Jo is actually Joanne, then I change it.
 
 merge all three
 
 ``` r
-final_df = bakes_df |>
-  full_join(bakers_df, by = c("baker", "series")) |>
-  full_join(results_df, by = c("series", "episode", "baker"))
-
-head(final_df)
+final_df = results_df |>
+  left_join(bakes_df, by = c("series", "episode", "baker")) |>
+  left_join(bakers_df, by = c("series", "baker")) 
 ```
 
-    ## # A tibble: 6 × 11
-    ##   series episode baker     signature_bake      show_stopper baker_name baker_age
-    ##    <dbl>   <dbl> <chr>     <chr>               <chr>        <chr>          <dbl>
-    ## 1      1       1 annetha   Light Jamaican Bla… Red, White … Annetha M…        30
-    ## 2      1       1 david     Chocolate Orange C… Black Fores… David Cha…        31
-    ## 3      1       1 edd       Caramel Cinnamon a… <NA>         Edd Kimber        24
-    ## 4      1       1 jasminder Fresh Mango and Pa… <NA>         Jasminder…        45
-    ## 5      1       1 jonathan  Carrot Cake with L… Three Tiere… Jonathan …        25
-    ## 6      1       1 lea       Cranberry and Pist… Raspberries… Lea Harris        51
-    ## # ℹ 4 more variables: baker_occupation <chr>, hometown <chr>, technical <dbl>,
-    ## #   result <chr>
+star bakers and winners from series 5 to 10
 
 ``` r
-write_csv(final_df, "./data/final_df.csv")
+star_bakers = final_df |> 
+  filter(series >= 5 & series <= 10) |> 
+  filter(result == "STAR BAKER" | result == "WINNER") |> 
+  select(series, episode, baker, result)
+
+star_bakers
 ```
+
+    ## # A tibble: 60 × 4
+    ##    series episode baker   result    
+    ##     <dbl>   <dbl> <chr>   <chr>     
+    ##  1      5       1 nancy   STAR BAKER
+    ##  2      5       2 richard STAR BAKER
+    ##  3      5       3 luis    STAR BAKER
+    ##  4      5       4 richard STAR BAKER
+    ##  5      5       5 kate    STAR BAKER
+    ##  6      5       6 chetna  STAR BAKER
+    ##  7      5       7 richard STAR BAKER
+    ##  8      5       8 richard STAR BAKER
+    ##  9      5       9 richard STAR BAKER
+    ## 10      5      10 nancy   WINNER    
+    ## # ℹ 50 more rows
+
+From series 5 to 10, the all the winners are from episode 10.
+
+load and clean the viewership data
+
+``` r
+viewers_df = read_csv("./data/viewers.csv", na = c("NA", ".", "", "N/A")) |> 
+  janitor::clean_names()
+```
+
+    ## Rows: 10 Columns: 11
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (11): Episode, Series 1, Series 2, Series 3, Series 4, Series 5, Series ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+tidy_viewers_df = viewers_df |> 
+  pivot_longer(
+    cols = starts_with("series"),  # Pivot columns that start with "series"
+    names_to = "season",  # The new column for the season (extracted from the column names)
+    values_to = "viewers",  # The corresponding viewership value for each season
+     names_prefix = "series_" # Remove the "series_" prefix to extract only the season number
+  ) |> 
+  mutate(
+    season = as.numeric(season)  # Convert the season values to numeric
+  )
+
+head(tidy_viewers_df, 10)
+```
+
+    ## # A tibble: 10 × 3
+    ##    episode season viewers
+    ##      <dbl>  <dbl>   <dbl>
+    ##  1       1      1    2.24
+    ##  2       1      2    3.1 
+    ##  3       1      3    3.85
+    ##  4       1      4    6.6 
+    ##  5       1      5    8.51
+    ##  6       1      6   11.6 
+    ##  7       1      7   13.6 
+    ##  8       1      8    9.46
+    ##  9       1      9    9.55
+    ## 10       1     10    9.62
+
+the avg viewers in series 1
+
+``` r
+avg_viewers_season_1 <- tidy_viewers_df |> 
+  filter(season == 1) |>  
+  summarise(avg_viewers = mean(viewers, na.rm = TRUE))
+  avg_viewers_season_1
+```
+
+    ## # A tibble: 1 × 1
+    ##   avg_viewers
+    ##         <dbl>
+    ## 1        2.77
+
+``` r
+avg_viewers_season_5 <- tidy_viewers_df |> 
+  filter(season == 5) |>  
+  summarise(avg_viewers = mean(viewers, na.rm = TRUE))
+  avg_viewers_season_5
+```
+
+    ## # A tibble: 1 × 1
+    ##   avg_viewers
+    ##         <dbl>
+    ## 1        10.0
