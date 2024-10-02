@@ -190,7 +190,10 @@ bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |>
   janitor::clean_names() |>
 
  mutate(
-    series = as.numeric(series))
+    series = as.numeric(series), 
+   baker =  word(baker_name, 1), 
+   baker = str_to_lower(str_trim(baker)
+   ))
 ```
 
     ## Rows: 120 Columns: 5
@@ -207,7 +210,9 @@ bakes_df = read_csv("./data/bakes.csv", na = c("NA", ".", "", "N/A")) |>
   janitor::clean_names() |>
   mutate(
     series = as.numeric(series),
-    episode = as.numeric(episode))
+    episode = as.numeric(episode), 
+    baker = str_to_lower(str_trim(baker)
+    ))
 ```
 
     ## Rows: 548 Columns: 5
@@ -224,7 +229,9 @@ results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip =
   janitor::clean_names() |>
   
   mutate(series = as.numeric(series),
-         episode = as.numeric(episode))
+         episode = as.numeric(episode), 
+         baker = str_to_lower(str_trim(baker))
+         )
 ```
 
     ## Rows: 1136 Columns: 5
@@ -236,6 +243,25 @@ results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip =
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
+``` r
+bakers_df
+```
+
+    ## # A tibble: 120 × 6
+    ##    baker_name       series baker_age baker_occupation             hometown baker
+    ##    <chr>             <dbl>     <dbl> <chr>                        <chr>    <chr>
+    ##  1 Ali Imdad             4        25 Charity worker               Saltley… ali  
+    ##  2 Alice Fevronia       10        28 Geography teacher            Essex    alice
+    ##  3 Alvin Magallanes      6        37 Nurse                        Brackne… alvin
+    ##  4 Amelia LeBruin       10        24 Fashion designer             Halifax  amel…
+    ##  5 Andrew Smyth          7        25 Aerospace engineer           Derby /… andr…
+    ##  6 Annetha Mills         1        30 Midwife                      Essex    anne…
+    ##  7 Antony Amourdoux      9        30 Banker                       London   anto…
+    ##  8 Beca Lyne-Pirkis      4        31 Military Wives' Choir Singer Aldersh… beca 
+    ##  9 Ben Frazer            2        31 Graphic Designer             Northam… ben  
+    ## 10 Benjamina Ebuehi      7        23 Teaching assistant           South L… benj…
+    ## # ℹ 110 more rows
+
 use `anti_join()` to compare two datasets
 
 ``` r
@@ -245,14 +271,14 @@ anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
     ## # A tibble: 8 × 5
     ##   series episode baker    signature_bake                            show_stopper
     ##    <dbl>   <dbl> <chr>    <chr>                                     <chr>       
-    ## 1      2       1 "\"Jo\"" Chocolate Orange CupcakesOrange and Card… Chocolate a…
-    ## 2      2       2 "\"Jo\"" Caramelised Onion, Gruyere and Thyme Qui… Raspberry a…
-    ## 3      2       3 "\"Jo\"" Stromboli flavored with Mozzarella, Ham,… Unknown     
-    ## 4      2       4 "\"Jo\"" Lavender Biscuits                         Blueberry M…
-    ## 5      2       5 "\"Jo\"" Salmon and Asparagus Pie                  Apple and R…
-    ## 6      2       6 "\"Jo\"" Rum and Raisin Baked Cheesecake           Limoncello …
-    ## 7      2       7 "\"Jo\"" Raspberry & Strawberry Mousse Cake        Pain Aux Ra…
-    ## 8      2       8 "\"Jo\"" Raspberry and Blueberry Mille Feuille     Mini Victor…
+    ## 1      2       1 "\"jo\"" Chocolate Orange CupcakesOrange and Card… Chocolate a…
+    ## 2      2       2 "\"jo\"" Caramelised Onion, Gruyere and Thyme Qui… Raspberry a…
+    ## 3      2       3 "\"jo\"" Stromboli flavored with Mozzarella, Ham,… Unknown     
+    ## 4      2       4 "\"jo\"" Lavender Biscuits                         Blueberry M…
+    ## 5      2       5 "\"jo\"" Salmon and Asparagus Pie                  Apple and R…
+    ## 6      2       6 "\"jo\"" Rum and Raisin Baked Cheesecake           Limoncello …
+    ## 7      2       7 "\"jo\"" Raspberry & Strawberry Mousse Cake        Pain Aux Ra…
+    ## 8      2       8 "\"jo\"" Raspberry and Blueberry Mille Feuille     Mini Victor…
 
 ``` r
 anti_join(results_df, bakes_df, by = c("series", "episode", "baker"))
@@ -261,16 +287,75 @@ anti_join(results_df, bakes_df, by = c("series", "episode", "baker"))
     ## # A tibble: 596 × 5
     ##    series episode baker    technical result
     ##     <dbl>   <dbl> <chr>        <dbl> <chr> 
-    ##  1      1       2 Lea             NA <NA>  
-    ##  2      1       2 Mark            NA <NA>  
-    ##  3      1       3 Annetha         NA <NA>  
-    ##  4      1       3 Lea             NA <NA>  
-    ##  5      1       3 Louise          NA <NA>  
-    ##  6      1       3 Mark            NA <NA>  
-    ##  7      1       4 Annetha         NA <NA>  
-    ##  8      1       4 Jonathan        NA <NA>  
-    ##  9      1       4 Lea             NA <NA>  
-    ## 10      1       4 Louise          NA <NA>  
+    ##  1      1       2 lea             NA <NA>  
+    ##  2      1       2 mark            NA <NA>  
+    ##  3      1       3 annetha         NA <NA>  
+    ##  4      1       3 lea             NA <NA>  
+    ##  5      1       3 louise          NA <NA>  
+    ##  6      1       3 mark            NA <NA>  
+    ##  7      1       4 annetha         NA <NA>  
+    ##  8      1       4 jonathan        NA <NA>  
+    ##  9      1       4 lea             NA <NA>  
+    ## 10      1       4 louise          NA <NA>  
     ## # ℹ 586 more rows
 
+``` r
+anti_join(bakers_df, bakes_df, by = c("baker", "series"))
+```
+
+    ## # A tibble: 26 × 6
+    ##    baker_name          series baker_age baker_occupation          hometown baker
+    ##    <chr>                <dbl>     <dbl> <chr>                     <chr>    <chr>
+    ##  1 Alice Fevronia          10        28 Geography teacher         Essex    alice
+    ##  2 Amelia LeBruin          10        24 Fashion designer          Halifax  amel…
+    ##  3 Antony Amourdoux         9        30 Banker                    London   anto…
+    ##  4 Briony Williams          9        33 Full-time parent          Bristol  brio…
+    ##  5 Dan Beasley-Harling      9        36 Full-time parent          London   dan  
+    ##  6 Dan Chambers            10        32 Support worker            Rotherh… dan  
+    ##  7 David Atherton          10        36 International health adv… Whitby   david
+    ##  8 Helena Garcia           10        40 Online project manager    Leeds    hele…
+    ##  9 Henry Bird              10        20 Student                   Durham   henry
+    ## 10 Imelda McCarron          9        33 Countryside recreation o… County … imel…
+    ## # ℹ 16 more rows
+
+``` r
+anti_join(bakes_df, bakers_df, by = c("baker", "series"))
+```
+
+    ## # A tibble: 8 × 5
+    ##   series episode baker    signature_bake                            show_stopper
+    ##    <dbl>   <dbl> <chr>    <chr>                                     <chr>       
+    ## 1      2       1 "\"jo\"" Chocolate Orange CupcakesOrange and Card… Chocolate a…
+    ## 2      2       2 "\"jo\"" Caramelised Onion, Gruyere and Thyme Qui… Raspberry a…
+    ## 3      2       3 "\"jo\"" Stromboli flavored with Mozzarella, Ham,… Unknown     
+    ## 4      2       4 "\"jo\"" Lavender Biscuits                         Blueberry M…
+    ## 5      2       5 "\"jo\"" Salmon and Asparagus Pie                  Apple and R…
+    ## 6      2       6 "\"jo\"" Rum and Raisin Baked Cheesecake           Limoncello …
+    ## 7      2       7 "\"jo\"" Raspberry & Strawberry Mousse Cake        Pain Aux Ra…
+    ## 8      2       8 "\"jo\"" Raspberry and Blueberry Mille Feuille     Mini Victor…
+
 merge all three
+
+``` r
+final_df = bakes_df |>
+  full_join(bakers_df, by = c("baker", "series")) |>
+  full_join(results_df, by = c("series", "episode", "baker"))
+
+head(final_df)
+```
+
+    ## # A tibble: 6 × 11
+    ##   series episode baker     signature_bake      show_stopper baker_name baker_age
+    ##    <dbl>   <dbl> <chr>     <chr>               <chr>        <chr>          <dbl>
+    ## 1      1       1 annetha   Light Jamaican Bla… Red, White … Annetha M…        30
+    ## 2      1       1 david     Chocolate Orange C… Black Fores… David Cha…        31
+    ## 3      1       1 edd       Caramel Cinnamon a… <NA>         Edd Kimber        24
+    ## 4      1       1 jasminder Fresh Mango and Pa… <NA>         Jasminder…        45
+    ## 5      1       1 jonathan  Carrot Cake with L… Three Tiere… Jonathan …        25
+    ## 6      1       1 lea       Cranberry and Pist… Raspberries… Lea Harris        51
+    ## # ℹ 4 more variables: baker_occupation <chr>, hometown <chr>, technical <dbl>,
+    ## #   result <chr>
+
+``` r
+write_csv(final_df, "./data/final_df.csv")
+```

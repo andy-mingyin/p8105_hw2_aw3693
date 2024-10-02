@@ -87,31 +87,47 @@ bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |>
   janitor::clean_names() |>
 
  mutate(
-    series = as.numeric(series))
+    series = as.numeric(series), 
+   baker =  word(baker_name, 1), 
+   baker = str_to_lower(str_trim(baker)
+   ))
 
 bakes_df = read_csv("./data/bakes.csv", na = c("NA", ".", "", "N/A")) |> 
   janitor::clean_names() |>
   mutate(
     series = as.numeric(series),
-    episode = as.numeric(episode))
+    episode = as.numeric(episode), 
+    baker = str_to_lower(str_trim(baker)
+    ))
 
 results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip = 2) |> 
   janitor::clean_names() |>
   
   mutate(series = as.numeric(series),
-         episode = as.numeric(episode))
-
+         episode = as.numeric(episode), 
+         baker = str_to_lower(str_trim(baker))
+         )
+bakers_df
 ```
 use `anti_join()` to compare two datasets
 
 ```{r}
 anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
 anti_join(results_df, bakes_df, by = c("series", "episode", "baker"))
+anti_join(bakers_df, bakes_df, by = c("baker", "series"))
+anti_join(bakes_df, bakers_df, by = c("baker", "series"))
 ```
 
 merge all three
 
 ```{r}
+final_df = bakes_df |>
+  full_join(bakers_df, by = c("baker", "series")) |>
+  full_join(results_df, by = c("series", "episode", "baker"))
 
+head(final_df)
+write_csv(final_df, "./data/final_df.csv")
 ```
+
+
 
