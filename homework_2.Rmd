@@ -1,0 +1,83 @@
+---
+title: "Homework 1"
+author: "Mingyin Wang"
+date: 2024-09-28
+output: github_document
+---
+
+```{r, results='hide'}
+library(tidyverse)
+library(readxl)
+library(haven)
+```
+
+## Problem 2
+load and clean mr trash wheel dataset
+```{r}
+mr_trash_wheel = read_excel("./202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1) |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(
+    sports_balls = as.integer(round(sports_balls)), 
+    source = "Mr. Trash Wheel"
+  )
+mr_trash_wheel
+```
+
+load and clean prof trash wheel dataset
+```{r}
+prof_trash_wheel = read_excel("./202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1) |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(
+   year = as.character(year), 
+    source = "Professor Trash Wheel"
+  )
+
+```
+
+
+load and clean Gwynnda trash wheel dataset
+
+```{r}
+gwynnda_trash_wheel = read_excel("./202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1) |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(
+   year = as.character(year), 
+    source = "Gwynnda Trash Wheel"
+  )
+gwynnda_trash_wheel
+```
+
+combine three dataset
+```{r}
+trash_wheel_data = 
+  bind_rows(mr_trash_wheel, prof_trash_wheel, gwynnda_trash_wheel) |> 
+  relocate(source)
+trash_wheel_data
+```
+
+total weight collected by prof trash wheel
+
+```{r}
+total_weight_pro = 
+  trash_wheel_data |>
+  filter(source == "Professor Trash Wheel") |> 
+  summarize(total_weight = sum(weight_tons, na.rm = TRUE))
+total_weight_pro
+```
+The total weight collected by prof trash wheel is `total_weight_pro`.
+
+Total cigarette butts collected by Gwynnda in June 2022
+```{r}
+tot_butts_june_2022=
+   trash_wheel_data |> 
+    filter(source == "Gwynnda Trash Wheel",month =="June", year == "2022") |> 
+  summarize(total_weight = sum(weight_tons, na.rm = TRUE))
+
+tot_butts_june_2022
+```
+The total cigarette butts collected by Gwynnda in June 2022 is `tot_butts_june_2022` tons. 
+
+
