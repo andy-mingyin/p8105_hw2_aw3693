@@ -3,10 +3,6 @@ Homework 1
 Mingyin Wang
 2024-09-28
 
-``` r
-library(tidyverse)
-```
-
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
     ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
@@ -17,11 +13,6 @@ library(tidyverse)
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
     ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
-library(readxl)
-library(haven)
-```
 
 ## Problem 2
 
@@ -74,7 +65,26 @@ prof_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sh
    year = as.character(year), 
     source = "Professor Trash Wheel"
   )
+prof_trash_wheel
 ```
+
+    ## # A tibble: 119 × 14
+    ##    dumpster month    year  date                weight_tons volume_cubic_yards
+    ##       <dbl> <chr>    <chr> <dttm>                    <dbl>              <dbl>
+    ##  1        1 January  2017  2017-01-02 00:00:00        1.79                 15
+    ##  2        2 January  2017  2017-01-30 00:00:00        1.58                 15
+    ##  3        3 February 2017  2017-02-26 00:00:00        2.32                 18
+    ##  4        4 February 2017  2017-02-26 00:00:00        3.72                 15
+    ##  5        5 February 2017  2017-02-28 00:00:00        1.45                 15
+    ##  6        6 March    2017  2017-03-30 00:00:00        1.71                 15
+    ##  7        7 April    2017  2017-04-01 00:00:00        1.82                 15
+    ##  8        8 April    2017  2017-04-20 00:00:00        2.37                 15
+    ##  9        9 May      2017  2017-05-10 00:00:00        2.64                 15
+    ## 10       10 May      2017  2017-05-26 00:00:00        2.78                 15
+    ## # ℹ 109 more rows
+    ## # ℹ 8 more variables: plastic_bottles <dbl>, polystyrene <dbl>,
+    ## #   cigarette_butts <dbl>, glass_bottles <dbl>, plastic_bags <dbl>,
+    ## #   wrappers <dbl>, homes_powered <dbl>, source <chr>
 
 load and clean Gwynnda trash wheel dataset
 
@@ -150,7 +160,7 @@ total_weight_pro
     ##          <dbl>
     ## 1         247.
 
-The total weight collected by prof trash wheel is `total_weight_pro`.
+The total weight collected by prof trash wheel is 246.74 tons.
 
 Total cigarette butts collected by Gwynnda in June 2022
 
@@ -168,7 +178,99 @@ tot_butts_june_2022
     ##          <dbl>
     ## 1         40.5
 
-The total cigarette butts collected by Gwynnda in June 2022 is
-`tot_butts_june_2022` tons.
+The total cigarette butts collected by Gwynnda in June 2022 is 40.53
+tons.
 
 ## Problem 3
+
+load the dataset and did some cleaning
+
+``` r
+bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |> 
+  janitor::clean_names() |>
+
+ mutate(
+    series = as.numeric(series))
+```
+
+    ## Rows: 120 Columns: 5
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): Baker Name, Baker Occupation, Hometown
+    ## dbl (2): Series, Baker Age
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+bakes_df = read_csv("./data/bakes.csv", na = c("NA", ".", "", "N/A")) |> 
+  janitor::clean_names() |>
+  mutate(
+    series = as.numeric(series),
+    episode = as.numeric(episode))
+```
+
+    ## Rows: 548 Columns: 5
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): Baker, Signature Bake, Show Stopper
+    ## dbl (2): Series, Episode
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip = 2) |> 
+  janitor::clean_names() |>
+  
+  mutate(series = as.numeric(series),
+         episode = as.numeric(episode))
+```
+
+    ## Rows: 1136 Columns: 5
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): baker, result
+    ## dbl (3): series, episode, technical
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+use `anti_join()` to compare two datasets
+
+``` r
+anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
+```
+
+    ## # A tibble: 8 × 5
+    ##   series episode baker    signature_bake                            show_stopper
+    ##    <dbl>   <dbl> <chr>    <chr>                                     <chr>       
+    ## 1      2       1 "\"Jo\"" Chocolate Orange CupcakesOrange and Card… Chocolate a…
+    ## 2      2       2 "\"Jo\"" Caramelised Onion, Gruyere and Thyme Qui… Raspberry a…
+    ## 3      2       3 "\"Jo\"" Stromboli flavored with Mozzarella, Ham,… Unknown     
+    ## 4      2       4 "\"Jo\"" Lavender Biscuits                         Blueberry M…
+    ## 5      2       5 "\"Jo\"" Salmon and Asparagus Pie                  Apple and R…
+    ## 6      2       6 "\"Jo\"" Rum and Raisin Baked Cheesecake           Limoncello …
+    ## 7      2       7 "\"Jo\"" Raspberry & Strawberry Mousse Cake        Pain Aux Ra…
+    ## 8      2       8 "\"Jo\"" Raspberry and Blueberry Mille Feuille     Mini Victor…
+
+``` r
+anti_join(results_df, bakes_df, by = c("series", "episode", "baker"))
+```
+
+    ## # A tibble: 596 × 5
+    ##    series episode baker    technical result
+    ##     <dbl>   <dbl> <chr>        <dbl> <chr> 
+    ##  1      1       2 Lea             NA <NA>  
+    ##  2      1       2 Mark            NA <NA>  
+    ##  3      1       3 Annetha         NA <NA>  
+    ##  4      1       3 Lea             NA <NA>  
+    ##  5      1       3 Louise          NA <NA>  
+    ##  6      1       3 Mark            NA <NA>  
+    ##  7      1       4 Annetha         NA <NA>  
+    ##  8      1       4 Jonathan        NA <NA>  
+    ##  9      1       4 Lea             NA <NA>  
+    ## 10      1       4 Louise          NA <NA>  
+    ## # ℹ 586 more rows
+
+merge all three

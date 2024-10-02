@@ -5,7 +5,7 @@ date: 2024-09-28
 output: github_document
 ---
 
-```{r, results='hide'}
+```{r, echo = FALSE}
 library(tidyverse)
 library(readxl)
 library(haven)
@@ -33,7 +33,7 @@ prof_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sh
    year = as.character(year), 
     source = "Professor Trash Wheel"
   )
-
+prof_trash_wheel
 ```
 
 
@@ -67,7 +67,7 @@ total_weight_pro =
   summarize(total_weight = sum(weight_tons, na.rm = TRUE))
 total_weight_pro
 ```
-The total weight collected by prof trash wheel is `total_weight_pro`.
+The total weight collected by prof trash wheel is `r total_weight_pro` tons.
 
 Total cigarette butts collected by Gwynnda in June 2022
 ```{r}
@@ -78,8 +78,40 @@ tot_butts_june_2022=
 
 tot_butts_june_2022
 ```
-The total cigarette butts collected by Gwynnda in June 2022 is `tot_butts_june_2022` tons. 
+The total cigarette butts collected by Gwynnda in June 2022 is `r tot_butts_june_2022` tons. 
 
 ## Problem 3
+load the dataset and did some cleaning
+```{r}
+bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |> 
+  janitor::clean_names() |>
 
+ mutate(
+    series = as.numeric(series))
+
+bakes_df = read_csv("./data/bakes.csv", na = c("NA", ".", "", "N/A")) |> 
+  janitor::clean_names() |>
+  mutate(
+    series = as.numeric(series),
+    episode = as.numeric(episode))
+
+results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip = 2) |> 
+  janitor::clean_names() |>
+  
+  mutate(series = as.numeric(series),
+         episode = as.numeric(episode))
+
+```
+use `anti_join()` to compare two datasets
+
+```{r}
+anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
+anti_join(results_df, bakes_df, by = c("series", "episode", "baker"))
+```
+
+merge all three
+
+```{r}
+
+```
 
