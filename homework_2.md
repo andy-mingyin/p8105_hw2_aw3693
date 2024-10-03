@@ -54,8 +54,7 @@ to work with by using `ifelse()`.
 
 After the data cleaning process, it is now tidy.
 
-After cleaning, the dataset contains 1868rows and `r`trans_col\`
-columns.
+After cleaning, the dataset contains 1868rows and 20 columns.
 
 ### creates distinct stations dataframe
 

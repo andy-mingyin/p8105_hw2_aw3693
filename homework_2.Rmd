@@ -41,7 +41,7 @@ I converted the entry variable from character format YES or NO to a logical vari
 
 After the data cleaning process, it is now tidy. 
 
-After cleaning, the dataset contains `r trans_row`rows and `r `trans_col` columns. 
+After cleaning, the dataset contains `r trans_row`rows and `r trans_col` columns. 
 
 ### creates distinct stations dataframe
 ```{r}
