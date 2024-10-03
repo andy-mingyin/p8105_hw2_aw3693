@@ -10,6 +10,95 @@ library(tidyverse)
 library(readxl)
 library(haven)
 ```
+## Problem 1
+
+creates the the dataframe
+```{r}
+nyc_trans_df = 
+  read_csv(
+    "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",  col_types = cols(Route8 = "c", Route9 = "c", Route10 = "c", Route11 = "c"))  |>
+  janitor::clean_names()  
+
+```
+
+```{r}
+clean_nyc_trans_df = nyc_trans_df |> 
+  select(
+    line, station_name, station_latitude, station_longitude, 
+    starts_with("route"), entry, exit_only, vending, entrance_type, 
+    ada) |> 
+  mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
+
+trans_row = nrow(clean_nyc_trans_df)
+trans_col = ncol(clean_nyc_trans_df)
+```
+This dataset contains information about subway entrances and exits in the NYC Transit system, with key variables including the line, station name, station latitude and longitude, routes served, whether entry is allowed at a specific entrance, the presence of vending machines, entrance type, and ADA (Americans with Disabilities Act) compliance. 
+
+I selected only relevant columns, such as line, station name, station latitude/longitude, routes, entry, vending, entrance type, and ADA compliance.
+I standardized column names using `janitor::clean_names()` to ensure consistency.
+I converted the entry variable from character format YES or NO to a logical variable TRUE or FALSE to make it easier to work with by using `ifelse()`. 
+
+After the data cleaning process, it is now tidy. 
+
+After cleaning, the dataset contains `r trans_row`rows and `r `trans_col` columns. 
+
+distinct stations
+```{r}
+distinct_stations = clean_nyc_trans_df |> 
+  distinct(station_name, line) |> 
+  count()
+
+```
+There are `r distinct_stations` distinct stations. 
+
+ADA compliant stations 
+```{r}
+ada_compliant_stations = clean_nyc_trans_df |> 
+  filter(ada == TRUE) |> 
+  distinct(station_name, line) |> 
+  count()
+```
+
+There are `r ada_compliant_stations` ADA compliant stations. 
+
+
+```{r}
+no_vending_entry_proportion =  
+  clean_nyc_trans_df |> 
+  filter(vending == "NO") |> 
+  pull(entry) |> 
+  mean()
+```
+The proportion of stations without vending that allow entry is `r no_vending_entry_proportion`.
+
+Reformat data so that route number and route name are distinct variables. 
+```{r}
+
+A_route = clean_nyc_trans_df |>
+  pivot_longer(
+    route1:route11,
+    names_to = "route_num",
+    values_to = "route") |> 
+  filter(route == "A") |> 
+  select(station_name, line) |> 
+  distinct() 
+
+
+A_ada= clean_nyc_trans_df |>
+  pivot_longer(
+    route1:route11,
+    names_to = "route_num",
+    values_to = "route") |> 
+  filter(route == "A" & ada == TRUE) |> 
+  select(station_name, line) |> 
+  distinct()
+```
+
+There are 60 distinct stations serve the A train. 
+
+Of the 60 stations that serve the A train, 17 are ADA compliant
+
+
 
 ## Problem 2
 load and clean mr trash wheel dataset
@@ -157,13 +246,13 @@ viewers_df = read_csv("./data/viewers.csv", na = c("NA", ".", "", "N/A")) |>
 
 tidy_viewers_df = viewers_df |> 
   pivot_longer(
-    cols = starts_with("series"),  # Pivot columns that start with "series"
-    names_to = "season",  # The new column for the season (extracted from the column names)
-    values_to = "viewers",  # The corresponding viewership value for each season
-     names_prefix = "series_" # Remove the "series_" prefix to extract only the season number
+    cols = starts_with("series"),  
+    names_to = "season",  
+    values_to = "viewers",  
+     names_prefix = "series_" 
   ) |> 
   mutate(
-    season = as.numeric(season)  # Convert the season values to numeric
+    season = as.numeric(season) 
   )
 
 head(tidy_viewers_df, 10)
@@ -186,3 +275,5 @@ avg_viewers_season_5 <- tidy_viewers_df |>
   avg_viewers_season_5
   
 ```
+The average viewership in Season 1 is `r avg_viewers_season_1` 
+The average viewership in Season 5 is `r avg_viewers_season_5` 
