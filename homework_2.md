@@ -16,7 +16,7 @@ Mingyin Wang
 
 ## Problem 1
 
-\###creates the the dataframe
+### creates the the dataframe
 
 ``` r
 nyc_trans_df = 
@@ -91,8 +91,7 @@ no_vending_entry_proportion =
 The proportion of stations without vending that allow entry is
 0.3770492.
 
-\###Reformat data so that route number and route name are distinct
-variables.
+### Reformat data so that route number and route name are distinct variables.
 
 ``` r
 A_route = clean_nyc_trans_df |>
@@ -121,7 +120,7 @@ Of the 60 stations that serve the A train, 17 are ADA compliant
 
 ## Problem 2
 
-\####load and clean mr trash wheel dataset.
+### load and clean mr trash wheel dataset.
 
 ``` r
 mr_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1, na = c(".", "NA", "")) |>
@@ -191,7 +190,7 @@ prof_trash_wheel
     ## #   cigarette_butts <dbl>, glass_bottles <dbl>, plastic_bags <dbl>,
     ## #   wrappers <dbl>, homes_powered <dbl>, source <chr>
 
-\###load and clean Gwynnda trash wheel dataset
+### load and clean Gwynnda trash wheel dataset
 
 ``` r
 gwynnda_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1,na = c(".", "NA", "")) |>
@@ -222,7 +221,7 @@ gwynnda_trash_wheel
     ## #   cigarette_butts <dbl>, plastic_bags <dbl>, wrappers <dbl>,
     ## #   homes_powered <dbl>, source <chr>
 
-\###combine three dataset
+### combine three dataset
 
 ``` r
 trash_wheel_data = 
@@ -264,7 +263,7 @@ and `sports_balls`. The `weight_tons` shows that the weight of the trash
 collected on that specific date. Rest of the key varaibles represent the
 amount of the kinds of trash that are collected on the specific date.
 
-\###total weight collected by prof trash wheel
+### total weight collected by prof trash wheel
 
 ``` r
 total_weight_pro = 
@@ -281,7 +280,7 @@ total_weight_pro
 
 The total weight collected by prof trash wheel is 246.74 tons.
 
-\###Total cigarette butts collected by Gwynnda in June 2022
+### Total cigarette butts collected by Gwynnda in June 2022
 
 ``` r
 tot_butts_june_2022=
@@ -302,7 +301,7 @@ tons.
 
 ## Problem 3
 
-\###load the dataset and did some cleaning
+### load the dataset and did some cleaning
 
 ``` r
 bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |> 
@@ -430,7 +429,7 @@ baker “Jo”, but there is no “Jo” in the result_df. Then, I checked that
 “Jo” and Joanne ’s episode and series match in two different data
 frames. Then, I change “Jo” to Joanne in the bakes_df.
 
-\###use `anti_join()` to compare three datasets
+### use `anti_join()` to compare three datasets
 
 ``` r
 anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
@@ -519,7 +518,7 @@ anti_join(bakers_df, results_df, by = c("series","baker"))
     ##   <chr>        <dbl>     <dbl> <chr>            <chr>        <chr>
     ## 1 jo wheatley      2        41 Housewife        Ongar, Essex jo
 
-\###merge all three
+### merge all three
 
 ``` r
 final_df = results_df |>
@@ -544,13 +543,13 @@ final_df
     ## # ℹ 1,126 more rows
     ## # ℹ 3 more variables: baker_age <dbl>, baker_occupation <chr>, hometown <chr>
 
-\###export as csv file
+### export as csv file
 
 ``` r
 write.csv(final_df, file = "./data/final_df.csv")
 ```
 
-\###star bakers and winners from series 5 to 10
+### star bakers and winners from series 5 to 10
 
 ``` r
 star_bakers = final_df |> 
@@ -578,7 +577,7 @@ star_bakers
 
 Findings: From series 5 to 10, the all the winners are from episode 10.
 
-\###load and clean the viewership data
+### load and clean the viewership data
 
 ``` r
 viewers_df = read_csv("./data/viewers.csv", na = c("NA", ".", "", "N/A")) |> 
