@@ -543,6 +543,12 @@ final_df
     ## # ℹ 1,126 more rows
     ## # ℹ 3 more variables: baker_age <dbl>, baker_occupation <chr>, hometown <chr>
 
+\#export as csv file
+
+``` r
+write.csv(final_df, file = "./data/final_df.csv")
+```
+
 \#star bakers and winners from series 5 to 10
 
 ``` r

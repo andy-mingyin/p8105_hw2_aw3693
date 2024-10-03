@@ -232,8 +232,11 @@ final_df = results_df |>
   left_join(bakers_df, by = c("series", "baker")) 
 final_df
 ```
+#export as csv file 
 
-
+```{r}
+write.csv(final_df, file = "./data/final_df.csv")
+```
 
 
 
