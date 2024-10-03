@@ -16,7 +16,7 @@ Mingyin Wang
 
 ## Problem 1
 
-creates the the dataframe
+\#creates the the dataframe
 
 ``` r
 nyc_trans_df = 
@@ -24,6 +24,8 @@ nyc_trans_df =
     "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",  col_types = cols(Route8 = "c", Route9 = "c", Route10 = "c", Route11 = "c"))  |>
   janitor::clean_names()  
 ```
+
+# clean the dataframe
 
 ``` r
 clean_nyc_trans_df = nyc_trans_df |> 
@@ -55,7 +57,7 @@ After the data cleaning process, it is now tidy.
 After cleaning, the dataset contains 1868rows and `r`trans_col\`
 columns.
 
-distinct stations
+# creates distinct stations dataframe
 
 ``` r
 distinct_stations = clean_nyc_trans_df |> 
@@ -65,7 +67,7 @@ distinct_stations = clean_nyc_trans_df |>
 
 There are 465 distinct stations.
 
-ADA compliant stations
+# ADA compliant stations dataframe
 
 ``` r
 ada_compliant_stations = clean_nyc_trans_df |> 
@@ -75,6 +77,8 @@ ada_compliant_stations = clean_nyc_trans_df |>
 ```
 
 There are 84 ADA compliant stations.
+
+\#proportion of no vending entry
 
 ``` r
 no_vending_entry_proportion =  
@@ -87,7 +91,7 @@ no_vending_entry_proportion =
 The proportion of stations without vending that allow entry is
 0.3770492.
 
-Reformat data so that route number and route name are distinct
+\#Reformat data so that route number and route name are distinct
 variables.
 
 ``` r
@@ -117,10 +121,10 @@ Of the 60 stations that serve the A train, 17 are ADA compliant
 
 ## Problem 2
 
-load and clean mr trash wheel dataset
+\#load and clean mr trash wheel dataset.
 
 ``` r
-mr_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1) |>
+mr_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1, na = c(".", "NA", "")) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -156,10 +160,10 @@ mr_trash_wheel
     ## #   wrappers <dbl>, sports_balls <int>, homes_powered <dbl>, x15 <lgl>,
     ## #   x16 <lgl>, source <chr>
 
-load and clean prof trash wheel dataset
+\#load and clean prof trash wheel dataset
 
 ``` r
-prof_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1) |>
+prof_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1, na = c(".", "NA", "")) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -187,10 +191,10 @@ prof_trash_wheel
     ## #   cigarette_butts <dbl>, glass_bottles <dbl>, plastic_bags <dbl>,
     ## #   wrappers <dbl>, homes_powered <dbl>, source <chr>
 
-load and clean Gwynnda trash wheel dataset
+\#load and clean Gwynnda trash wheel dataset
 
 ``` r
-gwynnda_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1) |>
+gwynnda_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1,na = c(".", "NA", "")) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -218,12 +222,13 @@ gwynnda_trash_wheel
     ## #   cigarette_butts <dbl>, plastic_bags <dbl>, wrappers <dbl>,
     ## #   homes_powered <dbl>, source <chr>
 
-combine three dataset
+\#combine three dataset
 
 ``` r
 trash_wheel_data = 
   bind_rows(mr_trash_wheel, prof_trash_wheel, gwynnda_trash_wheel) |> 
   relocate(source)
+
 trash_wheel_data
 ```
 
@@ -246,6 +251,18 @@ trash_wheel_data
     ## #   plastic_bags <dbl>, wrappers <dbl>, sports_balls <int>,
     ## #   homes_powered <dbl>, x15 <lgl>, x16 <lgl>
 
+The combined dataset includes observations from three different Trash
+Wheels: Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda. After
+importing and cleaning the data from three separate Excel sheets, we
+added an additional variable, `source`, to distinguish between the
+sources. The dataset contains 1033 rows and 17columns.
+
+The key variables are,:`date`, `weight_tons`,`volume_cubic_yards`,
+`plastic_bottles`, `polystyrene`,`cigarette_butts`, `glass_bottles` ,
+`plastic_bags`, `wrappers`, `glass_bottles`, `plastic_bags`, `wrappers`
+and `sports_balls`. The `weight_tons` shows that the weight of the trash
+collected on that specific date. Rest of the key varaibles represent the
+amount of the kinds of trash that are collected on the specific date.
 total weight collected by prof trash wheel
 
 ``` r
@@ -263,7 +280,7 @@ total_weight_pro
 
 The total weight collected by prof trash wheel is 246.74 tons.
 
-Total cigarette butts collected by Gwynnda in June 2022
+\#Total cigarette butts collected by Gwynnda in June 2022
 
 ``` r
 tot_butts_june_2022=
@@ -284,7 +301,7 @@ tons.
 
 ## Problem 3
 
-load the dataset and did some cleaning
+\#load the dataset and did some cleaning
 
 ``` r
 bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |> 
@@ -344,7 +361,75 @@ results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip =
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-use `anti_join()` to compare three datasets
+``` r
+bakes_df
+```
+
+    ## # A tibble: 548 × 5
+    ##    series episode baker     signature_bake                          show_stopper
+    ##     <dbl>   <dbl> <chr>     <chr>                                   <chr>       
+    ##  1      1       1 annetha   "Light Jamaican Black Cakewith Strawbe… Red, White …
+    ##  2      1       1 david     "Chocolate Orange Cake"                 Black Fores…
+    ##  3      1       1 edd       "Caramel Cinnamon and Banana Cake"      <NA>        
+    ##  4      1       1 jasminder "Fresh Mango and Passion Fruit Humming… <NA>        
+    ##  5      1       1 jonathan  "Carrot Cake with Lime and Cream Chees… Three Tiere…
+    ##  6      1       1 lea       "Cranberry and Pistachio Cakewith Oran… Raspberries…
+    ##  7      1       1 louise    "Carrot and Orange Cake"                Never Fail …
+    ##  8      1       1 mark      "Sticky Marmalade Tea Loaf"             Heart-shape…
+    ##  9      1       1 miranda   "Triple Layered Brownie Meringue Cake\… Three Tiere…
+    ## 10      1       1 ruth      "Three Tiered Lemon Drizzle Cakewith F… Classic Cho…
+    ## # ℹ 538 more rows
+
+``` r
+results_df
+```
+
+    ## # A tibble: 1,136 × 5
+    ##    series episode baker     technical result
+    ##     <dbl>   <dbl> <chr>         <dbl> <chr> 
+    ##  1      1       1 annetha           2 IN    
+    ##  2      1       1 david             3 IN    
+    ##  3      1       1 edd               1 IN    
+    ##  4      1       1 jasminder        NA IN    
+    ##  5      1       1 jonathan          9 IN    
+    ##  6      1       1 louise           NA IN    
+    ##  7      1       1 miranda           8 IN    
+    ##  8      1       1 ruth             NA IN    
+    ##  9      1       1 lea              10 OUT   
+    ## 10      1       1 mark             NA OUT   
+    ## # ℹ 1,126 more rows
+
+``` r
+bakers_df
+```
+
+    ## # A tibble: 120 × 6
+    ##    baker_name       series baker_age baker_occupation             hometown baker
+    ##    <chr>             <dbl>     <dbl> <chr>                        <chr>    <chr>
+    ##  1 ali imdad             4        25 Charity worker               Saltley… ali  
+    ##  2 alice fevronia       10        28 Geography teacher            Essex    alice
+    ##  3 alvin magallanes      6        37 Nurse                        Brackne… alvin
+    ##  4 amelia lebruin       10        24 Fashion designer             Halifax  amel…
+    ##  5 andrew smyth          7        25 Aerospace engineer           Derby /… andr…
+    ##  6 annetha mills         1        30 Midwife                      Essex    anne…
+    ##  7 antony amourdoux      9        30 Banker                       London   anto…
+    ##  8 beca lyne-pirkis      4        31 Military Wives' Choir Singer Aldersh… beca 
+    ##  9 ben frazer            2        31 Graphic Designer             Northam… ben  
+    ## 10 benjamina ebuehi      7        23 Teaching assistant           South L… benj…
+    ## # ℹ 110 more rows
+
+I standardize column names by using `janitor::clean_names()`. The
+`series` and`episode` columns are converted to numeric to ensure correct
+data types for furture analysis. There are first names and last name for
+bakers in baker_df, but there are only first names in the other 2
+dataframes. Then, I created another column to that only contains first
+name so that it will be easier to merge datasets. I found out that Jo is
+actually Joanne in bakes_df, since in the original bakes_df, there is a
+baker “Jo”, but there is no “Jo” in the result_df. Then, I checked that
+“Jo” and Joanne ’s episode and series match in two different data
+frames. Then, I change “Jo” to Joanne in the bakes_df.
+
+\#use `anti_join()` to compare three datasets
 
 ``` r
 anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
@@ -433,17 +518,32 @@ anti_join(bakers_df, results_df, by = c("series","baker"))
     ##   <chr>        <dbl>     <dbl> <chr>            <chr>        <chr>
     ## 1 jo wheatley      2        41 Housewife        Ongar, Essex jo
 
-I found out that Jo is actually Joanne, then I change it.
-
-merge all three
+\#merge all three
 
 ``` r
 final_df = results_df |>
   left_join(bakes_df, by = c("series", "episode", "baker")) |>
   left_join(bakers_df, by = c("series", "baker")) 
+final_df
 ```
 
-star bakers and winners from series 5 to 10
+    ## # A tibble: 1,136 × 11
+    ##    series episode baker  technical result signature_bake show_stopper baker_name
+    ##     <dbl>   <dbl> <chr>      <dbl> <chr>  <chr>          <chr>        <chr>     
+    ##  1      1       1 annet…         2 IN     "Light Jamaic… Red, White … annetha m…
+    ##  2      1       1 david          3 IN     "Chocolate Or… Black Fores… david cha…
+    ##  3      1       1 edd            1 IN     "Caramel Cinn… <NA>         edd kimber
+    ##  4      1       1 jasmi…        NA IN     "Fresh Mango … <NA>         jasminder…
+    ##  5      1       1 jonat…         9 IN     "Carrot Cake … Three Tiere… jonathan …
+    ##  6      1       1 louise        NA IN     "Carrot and O… Never Fail … louise br…
+    ##  7      1       1 miran…         8 IN     "Triple Layer… Three Tiere… miranda b…
+    ##  8      1       1 ruth          NA IN     "Three Tiered… Classic Cho… ruth clem…
+    ##  9      1       1 lea           10 OUT    "Cranberry an… Raspberries… lea harris
+    ## 10      1       1 mark          NA OUT    "Sticky Marma… Heart-shape… mark whit…
+    ## # ℹ 1,126 more rows
+    ## # ℹ 3 more variables: baker_age <dbl>, baker_occupation <chr>, hometown <chr>
+
+\#star bakers and winners from series 5 to 10
 
 ``` r
 star_bakers = final_df |> 
@@ -469,9 +569,9 @@ star_bakers
     ## 10      5      10 nancy   WINNER    
     ## # ℹ 50 more rows
 
-From series 5 to 10, the all the winners are from episode 10.
+Findings: From series 5 to 10, the all the winners are from episode 10.
 
-load and clean the viewership data
+\#load and clean the viewership data
 
 ``` r
 viewers_df = read_csv("./data/viewers.csv", na = c("NA", ".", "", "N/A")) |> 
@@ -515,7 +615,7 @@ head(tidy_viewers_df, 10)
     ##  9       1      9    9.55
     ## 10       1     10    9.62
 
-the avg viewers in series 1
+# find the avg viewers in series 1
 
 ``` r
 avg_viewers_season_1 <- tidy_viewers_df |> 
@@ -528,6 +628,8 @@ avg_viewers_season_1 <- tidy_viewers_df |>
     ##   avg_viewers
     ##         <dbl>
     ## 1        2.77
+
+# find the avg viewers in series 5
 
 ``` r
 avg_viewers_season_5 <- tidy_viewers_df |> 

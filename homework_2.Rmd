@@ -12,7 +12,7 @@ library(haven)
 ```
 ## Problem 1
 
-creates the the dataframe
+#creates the the dataframe
 ```{r}
 nyc_trans_df = 
   read_csv(
@@ -21,6 +21,7 @@ nyc_trans_df =
 
 ```
 
+# clean the dataframe
 ```{r}
 clean_nyc_trans_df = nyc_trans_df |> 
   select(
@@ -42,7 +43,7 @@ After the data cleaning process, it is now tidy.
 
 After cleaning, the dataset contains `r trans_row`rows and `r `trans_col` columns. 
 
-distinct stations
+# creates distinct stations dataframe
 ```{r}
 distinct_stations = clean_nyc_trans_df |> 
   distinct(station_name, line) |> 
@@ -51,7 +52,7 @@ distinct_stations = clean_nyc_trans_df |>
 ```
 There are `r distinct_stations` distinct stations. 
 
-ADA compliant stations 
+# ADA compliant stations dataframe
 ```{r}
 ada_compliant_stations = clean_nyc_trans_df |> 
   filter(ada == TRUE) |> 
@@ -61,7 +62,7 @@ ada_compliant_stations = clean_nyc_trans_df |>
 
 There are `r ada_compliant_stations` ADA compliant stations. 
 
-
+#proportion of no vending entry
 ```{r}
 no_vending_entry_proportion =  
   clean_nyc_trans_df |> 
@@ -71,7 +72,7 @@ no_vending_entry_proportion =
 ```
 The proportion of stations without vending that allow entry is `r no_vending_entry_proportion`.
 
-Reformat data so that route number and route name are distinct variables. 
+#Reformat data so that route number and route name are distinct variables. 
 ```{r}
 
 A_route = clean_nyc_trans_df |>
@@ -101,9 +102,10 @@ Of the 60 stations that serve the A train, 17 are ADA compliant
 
 
 ## Problem 2
-load and clean mr trash wheel dataset
+
+#load and clean mr trash wheel dataset.
 ```{r}
-mr_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1) |>
+mr_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1, na = c(".", "NA", "")) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -113,9 +115,9 @@ mr_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", shee
 mr_trash_wheel
 ```
 
-load and clean prof trash wheel dataset
+#load and clean prof trash wheel dataset
 ```{r}
-prof_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1) |>
+prof_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1, na = c(".", "NA", "")) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -126,10 +128,10 @@ prof_trash_wheel
 ```
 
 
-load and clean Gwynnda trash wheel dataset
+#load and clean Gwynnda trash wheel dataset
 
 ```{r}
-gwynnda_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1) |>
+gwynnda_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1,na = c(".", "NA", "")) |>
   janitor::clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
@@ -139,14 +141,18 @@ gwynnda_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx",
 gwynnda_trash_wheel
 ```
 
-combine three dataset
+#combine three dataset
 ```{r}
 trash_wheel_data = 
   bind_rows(mr_trash_wheel, prof_trash_wheel, gwynnda_trash_wheel) |> 
   relocate(source)
+
 trash_wheel_data
 ```
+The combined dataset includes observations from three different Trash Wheels: Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda. After importing and cleaning the data from three separate Excel sheets, we added an additional variable, `source`, to distinguish between the sources. The dataset contains `r nrow(trash_wheel_data)` rows and `r ncol(trash_wheel_data)`columns.
 
+The key variables are,:`date`, `weight_tons`,`volume_cubic_yards`, `plastic_bottles`, `polystyrene`,`cigarette_butts`, `glass_bottles`
+, `plastic_bags`, `wrappers`, `glass_bottles`, `plastic_bags`, `wrappers` and `sports_balls`. The `weight_tons` shows that the weight of the trash collected on that specific date. Rest of the key varaibles represent the amount of the kinds of trash that are collected on the specific date.
 total weight collected by prof trash wheel
 
 ```{r}
@@ -158,7 +164,7 @@ total_weight_pro
 ```
 The total weight collected by prof trash wheel is `r total_weight_pro` tons.
 
-Total cigarette butts collected by Gwynnda in June 2022
+#Total cigarette butts collected by Gwynnda in June 2022
 ```{r}
 tot_butts_june_2022=
    trash_wheel_data |> 
@@ -170,7 +176,8 @@ tot_butts_june_2022
 The total cigarette butts collected by Gwynnda in June 2022 is `r tot_butts_june_2022` tons. 
 
 ## Problem 3
-load the dataset and did some cleaning
+
+#load the dataset and did some cleaning
 
 ```{r}
 bakers_df = read_csv("./data/bakers.csv", na = c("NA", ".", "", "N/A")) |> 
@@ -199,10 +206,13 @@ results_df = read_csv("./data/results.csv", na = c("NA", ".", "", "N/A"), skip =
     episode = as.numeric(episode), 
     baker = str_to_lower(str_trim(baker))  
   )
+bakes_df
+results_df
+bakers_df
 ```
-
-use `anti_join()` to compare three datasets
-
+I standardize column names by using `janitor::clean_names()`. The `series` and`episode` columns are converted to numeric to ensure correct data types for furture analysis. There are first names and last name for bakers in baker_df, but there are only first names in the other 2 dataframes. Then, I created another column to that only contains first name so that it will be easier to merge datasets. I found out that Jo is actually Joanne in bakes_df, since in the original bakes_df, there is a baker "Jo", but there is no "Jo" in the result_df. Then, I checked that "Jo" and Joanne 's episode and series match in two different data frames. Then, I change "Jo" to Joanne in the bakes_df. 
+ 
+#use `anti_join()` to compare three datasets
 
 ```{r}
 anti_join(bakes_df, results_df, by = c("series", "episode", "baker"))
@@ -212,21 +222,22 @@ anti_join(bakes_df, bakers_df, by = c("baker", "series"))
 anti_join(results_df, bakers_df, by = c("series", "baker"))
 anti_join(bakers_df, results_df, by = c("series","baker"))
 ```
-I found out that Jo is actually Joanne, then I change it. 
 
 
-merge all three
+
+#merge all three
 ```{r}
 final_df = results_df |>
   left_join(bakes_df, by = c("series", "episode", "baker")) |>
   left_join(bakers_df, by = c("series", "baker")) 
+final_df
 ```
 
 
 
 
 
-star bakers and winners from series 5 to 10
+#star bakers and winners from series 5 to 10
 ```{r}
 star_bakers = final_df |> 
   filter(series >= 5 & series <= 10) |> 
@@ -236,9 +247,9 @@ star_bakers = final_df |>
 star_bakers
 ```
 
-From series 5 to 10, the all the winners are from episode 10. 
+Findings: From series 5 to 10, the all the winners are from episode 10. 
 
-load and clean the viewership data 
+#load and clean the viewership data 
 
 ```{r}
 viewers_df = read_csv("./data/viewers.csv", na = c("NA", ".", "", "N/A")) |> 
@@ -257,7 +268,8 @@ tidy_viewers_df = viewers_df |>
 
 head(tidy_viewers_df, 10)
 ```
-the avg viewers in series 1
+
+# find the avg viewers in series 1 
 
 ```{r}
 
@@ -266,7 +278,7 @@ avg_viewers_season_1 <- tidy_viewers_df |>
   summarise(avg_viewers = mean(viewers, na.rm = TRUE))
   avg_viewers_season_1
 ```
-
+# find the avg viewers in series 5
 ```{r}
 
 avg_viewers_season_5 <- tidy_viewers_df |> 
